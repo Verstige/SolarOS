@@ -2,10 +2,21 @@
   "build": {
     "builder": "NIXPACKS",
     "nixpacks": {
-      "NIXPACKS_DISABLE_CACHE": "true"
+      "NIXPACKS_DISABLE_CACHE": "true",
+      "NIXPACKS_PYTHON_PIP_INDEX_URL": ""
     }
   },
   "deploy": {
     "numReplicas": 1
-  }
+  },
+  "var": [
+    {
+      "name": "NODE_ENV",
+      "value": "production"
+    },
+    {
+      "name": "PORT",
+      "value": "3000"
+    }
+  ]
 }
