@@ -1,16 +1,18 @@
 FROM node:18-slim
 
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid nodejs --shell /bin/bash nextjs
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
 
-ENV NODE_ENV=production
-ENV PORT=3000
+USER nextjs
+ENV NODE_ENV=production PORT=3000
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["node", ".next/standalone/server.js"]
