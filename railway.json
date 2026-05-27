@@ -1,6 +1,9 @@
 {
   "build": {
-    "builder": "DOCKERFILE"
+    "builder": "NIXPACKS",
+    "nixpacks": {
+      "NIXPACKS_DISABLE_CACHE": "true"
+    }
   },
   "deploy": {
     "numReplicas": 1
