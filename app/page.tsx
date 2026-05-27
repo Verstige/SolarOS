@@ -1,19 +1,11 @@
 'use client';
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Zap, Users, BarChart3, Calendar, FileText, 
-  Megaphone, Shield, Wrench, Settings, Bell,
-  TrendingUp, TrendingDown, ArrowRight, ChevronRight,
-  Sun, DollarSign, Clock, CheckCircle2, AlertCircle,
-  Facebook, Instagram, Linkedin, Youtube,
-  Mail, HardDrive, CalendarCheck, FileCheck,
-  Plus, Search, Eye, Edit, PlusCircle, ArrowUpRight
-} from 'lucide-react';
+import { useState } from 'react';
+import { Zap, BarChart3, Users, Megaphone, Shield, Calendar, ArrowRight, CheckCircle2, Sun, ChevronRight, Play, Star, Menu, X, Clock, DollarSign, Wrench } from 'lucide-react';
 
 const SOLAR = {
   primary: '#FF6B00',
-  secondary: '#00D4AA', 
+  secondary: '#00D4AA',
   accent: '#FFD60A',
   bg: '#000000',
   surface: '#0A0A0F',
@@ -24,235 +16,317 @@ const SOLAR = {
   text: '#FFFFFF',
   success: '#30D158',
   warning: '#FF9F0A',
-  danger: '#FF453A',
 };
 
+const FEATURES = [
+  { icon: Zap, title: 'AI-Powered Proposals', desc: 'Generate professional solar proposals in under 2 hours. AI analyzes roof specs, energy usage, and local utility rates to build compelling quotes that close deals.', color: SOLAR.primary },
+  { icon: BarChart3, title: 'Visual Pipeline', desc: 'Track every project from lead to activation. Drag-and-drop kanban board with real-time status, priority flags, and milestone tracking.', color: SOLAR.secondary },
+  { icon: Users, title: 'Team Management', desc: 'Onboard installers, electricians, and sales reps with structured workflows. Training modules, certifications, and performance metrics in one place.', color: '#BF5FFF' },
+  { icon: Megaphone, title: 'Social Hub', desc: 'Manage Facebook, Instagram, LinkedIn, and YouTube from one dashboard. Schedule posts, track ad performance, and generate AI-powered content.', color: '#FF2D55' },
+  { icon: Calendar, title: 'Smart Scheduling', desc: 'Auto-schedule installations based on crew availability, permits, and weather windows. Never double-book or miss a deadline.', color: '#5856D6' },
+  { icon: Shield, title: 'Permit Automation', desc: 'Automated permit preparation and submission. Track inspection status and receive alerts when docs are approved or rejected.', color: SOLAR.warning },
+];
+
 const MODULES = [
-  { icon: Zap, label: 'AI Proposals', color: '#FF6B00', desc: '2-hour proposals', path: '/pipeline', badge: 'AI-Powered' },
-  { icon: BarChart3, label: 'Pipeline', color: '#00D4AA', desc: '7-stage kanban', path: '/pipeline', badge: null },
-  { icon: Users, label: 'Team', color: '#BF5FFF', desc: '12 active', path: '/employees', badge: 'Onboarding' },
-  { icon: Megaphone, label: 'Social Hub', color: '#FF2D55', desc: '4 accounts', path: '/social', badge: '3 Scheduled' },
-  { icon: CalendarCheck, label: 'Scheduling', color: '#5856D6', desc: '5 jobs today', path: '/pipeline', badge: null },
-  { icon: FileCheck, label: 'Permits', color: '#FF9F0A', desc: '2 pending', path: '/pipeline', badge: 'Urgent' },
-  { icon: Mail, label: 'Google Workspace', color: '#4285F4', desc: 'Gmail + Drive + Calendar', path: '/social', badge: null },
-  { icon: DollarSign, label: 'Revenue', color: '#30D158', desc: '$847K this quarter', path: '/pipeline', badge: null },
+  { label: 'AI Proposals', path: '/dashboard', color: SOLAR.primary, badge: 'AI-Powered' },
+  { label: 'Pipeline', path: '/dashboard/pipeline', color: SOLAR.secondary, badge: null },
+  { label: 'Social Hub', path: '/dashboard/social', color: '#FF2D55', badge: null },
+  { label: 'Team', path: '/dashboard/employees', color: '#BF5FFF', badge: null },
+  { label: 'Scheduling', path: '/dashboard', color: '#5856D6', badge: null },
+  { label: 'Permits', path: '/dashboard', color: SOLAR.warning, badge: 'Auto' },
 ];
 
-const SOCIAL_ACCOUNTS = [
-  { platform: 'facebook', icon: Facebook, connected: true, name: 'Tampa Solar Co', followers: '12.4K' },
-  { platform: 'instagram', icon: Instagram, connected: true, name: '@tampasolarco', followers: '8.2K' },
-  { platform: 'linkedin', icon: Linkedin, connected: true, name: 'Tampa Solar Co', followers: '3.1K' },
-  { platform: 'youtube', icon: Youtube, connected: false, name: 'YouTube', followers: '' },
+const TESTIMONIALS = [
+  { name: 'David R.', role: 'Owner, Tampa Solar Co.', content: 'We cut our proposal time from 3 days to 4 hours. The AI does the heavy lifting on roof calculations and financing scenarios.', rating: 5 },
+  { name: 'Maria L.', role: 'Operations Director, SunVolt FL', content: 'Managing 12 crews used to be chaos. SolarOS gave us clarity. We know exactly where every job stands every morning.', rating: 5 },
+  { name: 'James T.', role: 'Sales Manager, Skyline Energy', content: 'The social calendar alone saves us 6 hours a week. Our Instagram engagement is up 40% since we started using the AI content suggestions.', rating: 5 },
 ];
 
-const RECENT_PROPOSALS = [
-  { id: '#PRO-2847', client: 'Roberto Martinez', value: '$42,500', status: 'Sent', date: '2h ago' },
-  { id: '#PRO-2846', client: 'Jennifer Walsh', value: '$38,200', status: 'Draft', date: '5h ago' },
-  { id: '#PRO-2845', client: 'Mark Thompson', value: '$56,000', status: 'Won', date: 'Yesterday' },
-  { id: '#PRO-2844', client: 'Sarah Chen', value: '$44,800', status: 'Lost', date: '2d ago' },
+const PRICING = [
+  { name: 'Starter', price: '299', desc: 'For small solar companies getting started', features: ['1 User', '50 Proposals/mo', 'Pipeline Tracking', 'Email Support'], color: SOLAR.muted },
+  { name: 'Growth', price: '599', desc: 'For growing teams that need more power', features: ['5 Users', 'Unlimited Proposals', 'Social Hub', 'Team Management', 'Priority Support'], color: SOLAR.primary, popular: true },
+  { name: 'Scale', price: '999', desc: 'For established companies at scale', features: ['15 Users', 'Everything in Growth', 'Permit Automation', 'Google Workspace', 'Dedicated Account Manager'], color: SOLAR.secondary },
+  { name: 'Enterprise', price: '2,000+', desc: 'Custom solution for large operations', features: ['Unlimited Users', 'White-Label Options', 'Custom Integrations', 'SLA & Onboarding', 'API Access'], color: SOLAR.accent },
 ];
 
-function MetricCard({ label, value, delta, icon: Icon, color, delay = 0 }: { label: string; value: string; delta?: string; icon: any; color: string; delay?: number }) {
+const STATS = [
+  { value: '2hrs', label: 'Avg. proposal time (was 3 days)' },
+  { value: '40%', label: 'More installs per quarter' },
+  { value: '6hrs', label: 'Saved per week on social' },
+  { value: '52%', label: 'Faster permitting cycles' },
+];
+
+function Nav() {
+  const [open, setOpen] = useState(false);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: 'easeOut' }}
-      className="relative overflow-hidden rounded-2xl p-5 group cursor-pointer"
-      style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}
-    >
-      <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-3xl opacity-20 group-hover:opacity-35 transition-opacity" style={{ background: color }} />
-      <div className="flex items-start justify-between mb-3">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${color}20` }}>
-          <Icon size={18} style={{ color }} />
+    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ background: 'rgba(0,0,0,0.9)', borderBottom: `1px solid ${SOLAR.border}` }}>
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${SOLAR.primary}, ${SOLAR.accent})` }}>
+            <Sun size={18} style={{ color: '#000' }} />
+          </div>
+          <span className="font-bold text-lg">SolarOS</span>
         </div>
-        {delta && (
-          <span className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full"
-            style={{ background: delta.startsWith('+') ? `${SOLAR.success}20` : `${SOLAR.danger}20`, color: delta.startsWith('+') ? SOLAR.success : SOLAR.danger }}>
-            {delta.startsWith('+') ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            {delta}
-          </span>
-        )}
+        <nav className="hidden md:flex items-center gap-8">
+          {['Features', 'Modules', 'Pricing', 'Testimonials'].map(item => (
+            <a key={item} href={`#${item.toLowerCase()}`} className="text-sm" style={{ color: SOLAR.muted }}>{item}</a>
+          ))}
+        </nav>
+        <div className="hidden md:flex items-center gap-3">
+          <a href="/dashboard" className="text-sm px-4 py-2 rounded-xl" style={{ color: SOLAR.muted }}>Sign In</a>
+          <a href="/dashboard" className="text-sm font-semibold px-5 py-2.5 rounded-xl" style={{ background: SOLAR.primary, color: '#000' }}>Get Started Free</a>
+        </div>
+        <button className="md:hidden w-9 h-9 flex items-center justify-center" onClick={() => setOpen(!open)}>
+          {open ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
-      <div className="text-3xl font-bold mb-1 tracking-tight">{value}</div>
-      <div className="text-sm" style={{ color: SOLAR.muted }}>{label}</div>
-    </motion.div>
-  );
-}
-
-function ModuleCard({ module, index }: { module: typeof MODULES[0]; index: number }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 + index * 0.08, duration: 0.4, ease: 'easeOut' }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      className="relative rounded-2xl p-5 cursor-pointer"
-      style={{ background: SOLAR.surface, border: `1px solid ${hovered ? SOLAR.borderHover : SOLAR.border}`, transform: hovered ? 'translateY(-2px)' : 'none', transition: 'all 0.2s ease-out' }}
-    >
-      {module.badge && (
-        <span className="absolute top-4 right-4 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ background: `${module.color}20`, color: module.color }}>
-          {module.badge}
-        </span>
+      {open && (
+        <div className="md:hidden pt-4 pb-2 space-y-2">
+          {['Features', 'Modules', 'Pricing', 'Testimonials'].map(item => (
+            <a key={item} href={`#${item.toLowerCase()}`} className="block text-sm py-2" style={{ color: SOLAR.muted }} onClick={() => setOpen(false)}>{item}</a>
+          ))}
+          <a href="/dashboard" className="block text-sm font-semibold py-2" style={{ color: SOLAR.primary }}>Get Started Free</a>
+        </div>
       )}
-      <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: `${module.color}18` }}>
-        <module.icon size={22} style={{ color: module.color }} />
-      </div>
-      <div className="font-semibold text-base mb-1">{module.label}</div>
-      <div className="text-sm" style={{ color: SOLAR.muted }}>{module.desc}</div>
-      <motion.div className="absolute bottom-4 right-4" initial={{ opacity: 0, x: -5 }} animate={{ opacity: hovered ? 1 : 0, x: hovered ? 0 : -5 }} transition={{ duration: 0.15 }}>
-        <ArrowRight size={16} style={{ color: module.color }} />
-      </motion.div>
-    </motion.div>
+    </header>
   );
 }
 
-function ProposalRow({ id, client, value, status, date }: { id: string; client: string; value: string; status: string; date: string }) {
-  const statusColors: Record<string, string> = { Draft: '#8E8E93', Sent: '#FF9F0A', Won: '#30D158', Lost: '#FF453A' };
+function Hero() {
   return (
-    <div className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/[0.03] transition-colors cursor-pointer group" style={{ borderBottom: `1px solid ${SOLAR.border}` }}>
-      <div className="flex-1">
-        <div className="font-medium text-sm">{client}</div>
-        <div className="text-xs mt-0.5" style={{ color: SOLAR.muted }}>{id} · {date}</div>
-      </div>
-      <div className="font-semibold text-sm">{value}</div>
-      <span className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: `${statusColors[status]}20`, color: statusColors[status] }}>{status}</span>
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white/10"><Eye size={13} style={{ color: SOLAR.muted }} /></button>
-        <button className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white/10"><Edit size={13} style={{ color: SOLAR.muted }} /></button>
-      </div>
-    </div>
-  );
-}
-
-function SocialPreview({ platform, content, scheduled }: { platform: string; content: string; scheduled?: string }) {
-  const icons: Record<string, any> = { facebook: Facebook, instagram: Instagram, linkedin: Linkedin, youtube: Youtube };
-  const colors: Record<string, string> = { facebook: '#1877F2', instagram: '#E4405F', linkedin: '#0A66C2', youtube: '#FF0000' };
-  const Icon = icons[platform] || Facebook;
-  const color = colors[platform] || '#1877F2';
-  return (
-    <div className="rounded-xl p-4" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}20` }}>
-          <Icon size={14} style={{ color }} />
-        </div>
-        <div className="flex-1">
-          <div className="text-sm font-medium capitalize">{platform}</div>
-          {scheduled && <div className="text-xs" style={{ color: SOLAR.muted }}>Scheduled for {scheduled}</div>}
-        </div>
-        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: `${SOLAR.warning}20`, color: SOLAR.warning }}>SCHEDULED</span>
-      </div>
-      <p className="text-sm leading-relaxed">{content}</p>
-    </div>
-  );
-}
-
-export default function SolarDashboard() {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  return (
-    <div className="min-h-screen pb-24" style={{ background: SOLAR.bg }}>
-      <motion.header className="sticky top-0 z-50 px-6 py-4 backdrop-blur-xl" style={{ background: 'rgba(0,0,0,0.85)', borderBottom: `1px solid ${SOLAR.border}` }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${SOLAR.primary}, ${SOLAR.accent})` }}>
-              <Sun size={18} style={{ color: SOLAR.bg }} />
-            </div>
-            <div>
-              <div className="font-bold text-lg tracking-tight">SolarOS</div>
-              <div className="text-[10px] uppercase tracking-widest" style={{ color: SOLAR.muted }}>Operating System</div>
-            </div>
+    <section className="min-h-screen flex items-center justify-center pt-20 px-6 relative overflow-hidden">
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,107,0,0.12) 0%, transparent 60%)' }} />
+      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10" style={{ background: SOLAR.primary }} />
+      <div className="max-w-4xl mx-auto text-center relative z-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium mb-8" style={{ background: `${SOLAR.primary}15`, border: `1px solid ${SOLAR.primary}30`, color: SOLAR.primary }}>
+            <Zap size={12} /> Now deployed to regional solar companies across Florida
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 rounded-2xl flex-1 max-w-md" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}>
-            <Search size={16} style={{ color: SOLAR.muted }} />
-            <input type="text" placeholder="Search proposals, clients, tasks..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 bg-transparent text-sm outline-none" style={{ color: SOLAR.text }} />
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold" style={{ background: SOLAR.primary, color: '#000' }}><Plus size={15} />New Proposal</button>
-            <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}><Bell size={16} style={{ color: SOLAR.muted }} /></button>
-            <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}><Settings size={16} style={{ color: SOLAR.muted }} /></button>
-            <div className="w-9 h-9 rounded-full ml-2 cursor-pointer" style={{ background: `linear-gradient(135deg, ${SOLAR.primary}, ${SOLAR.secondary})` }} />
-          </div>
-        </div>
-      </motion.header>
-
-      <div className="max-w-7xl mx-auto px-6 pt-8">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Command Center</h1>
-          <p style={{ color: SOLAR.muted }}>Overview of your solar operations — May 27, 2026</p>
-        </motion.div>
-
-        <div className="grid grid-cols-4 gap-4 mb-8 mt-6">
-          <MetricCard label="Active Proposals" value="$284K" delta="+12%" icon={FileText} color={SOLAR.primary} delay={0} />
-          <MetricCard label="Pipeline Value" value="$1.2M" delta="+8%" icon={BarChart3} color={SOLAR.secondary} delay={0.05} />
-          <MetricCard label="Installations" value="34" delta="+5" icon={Wrench} color={SOLAR.accent} delay={0.1} />
-          <MetricCard label="Team Members" value="12" delta="+2" icon={Users} color="#BF5FFF" delay={0.15} />
-        </div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Platform Modules</h2>
-            <button className="text-sm flex items-center gap-1 hover:opacity-80" style={{ color: SOLAR.primary }}>View all <ChevronRight size={14} /></button>
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {MODULES.map((mod, i) => <ModuleCard key={mod.label} module={mod} index={i} />)}
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight" style={{ color: SOLAR.text }}>
+            The Operating System<br />
+            <span style={{ color: SOLAR.primary }}>For Solar Companies</span>
+          </h1>
+          <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto" style={{ color: SOLAR.muted }}>
+            AI-powered proposals. Visual pipeline. Social automation. Team management. Everything in one place — built for companies doing $500K to $50M in annual solar volume.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="/dashboard" className="flex items-center gap-2 px-8 py-4 rounded-2xl text-lg font-bold" style={{ background: SOLAR.primary, color: '#000' }}>
+              Launch App Free <ArrowRight size={18} />
+            </a>
+            <a href="#features" className="flex items-center gap-2 px-8 py-4 rounded-2xl text-lg font-medium" style={{ border: `1px solid ${SOLAR.border}`, color: SOLAR.muted }}>
+              <Play size={16} /> See How It Works
+            </a>
           </div>
         </motion.div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="rounded-2xl p-5" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Recent Proposals</h3>
-              <button className="text-sm" style={{ color: SOLAR.primary }}>+ New</button>
+        <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }} className="mt-16">
+          <div className="rounded-3xl overflow-hidden" style={{ border: `1px solid ${SOLAR.border}`, boxShadow: `0 0 80px rgba(255,107,0,0.15)` }}>
+            <div className="flex items-center gap-2 px-4 py-3" style={{ background: SOLAR.surface, borderBottom: `1px solid ${SOLAR.border}` }}>
+              <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full" style={{ background: '#FF5F57' }} /><div className="w-3 h-3 rounded-full" style={{ background: '#FFBD2E' }} /><div className="w-3 h-3 rounded-full" style={{ background: '#28CA41' }} /></div>
+              <div className="flex-1 text-center text-xs" style={{ color: SOLAR.muted }}>solaros.app / dashboard</div>
             </div>
-            {RECENT_PROPOSALS.map((p) => <ProposalRow key={p.id} {...p} />)}
-          </motion.div>
+            <div style={{ background: SOLAR.bg, height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="text-center">
+                <div className="text-6xl mb-4"><Sun size={64} style={{ color: SOLAR.primary }} /></div>
+                <div className="text-2xl font-bold mb-2">Command Center</div>
+                <div className="text-sm" style={{ color: SOLAR.muted }}>Pipeline · Proposals · Social · Team · Permits</div>
+                <div className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ background: `${SOLAR.primary}20`, color: SOLAR.primary }}>
+                  <ArrowRight size={14} /> Open Dashboard
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="rounded-2xl p-5" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Social Hub</h3>
-              <div className="flex gap-1">
-                {SOCIAL_ACCOUNTS.slice(0,3).map((acc) => (
-                  <div key={acc.platform} className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: SOLAR.border }}>
-                    <acc.icon size={12} style={{ color: SOLAR.muted }} />
+function Stats() {
+  return (
+    <section className="py-20 px-6" style={{ borderTop: `1px solid ${SOLAR.border}`, borderBottom: `1px solid ${SOLAR.border}` }}>
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {STATS.map((stat, i) => (
+            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+              <div className="text-4xl font-bold mb-1" style={{ color: SOLAR.primary }}>{stat.value}</div>
+              <div className="text-sm" style={{ color: SOLAR.muted }}>{stat.label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Features() {
+  return (
+    <section id="features" className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: SOLAR.primary }}>Platform Capabilities</div>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Everything your team needs</h2>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: SOLAR.muted }}>Stop juggling 7 different tools. SolarOS brings proposals, pipeline, social, and team management into one coherent operating system.</p>
+        </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURES.map((f, i) => (
+            <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+              className="rounded-2xl p-6" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: `${f.color}18` }}>
+                <f.icon size={22} style={{ color: f.color }} />
+              </div>
+              <h3 className="text-lg font-bold mb-2">{f.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: SOLAR.muted }}>{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Modules() {
+  return (
+    <section id="modules" className="py-24 px-6" style={{ background: SOLAR.surface }}>
+      <div className="max-w-6xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: SOLAR.secondary }}>Platform Modules</div>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">One platform. Every workflow.</h2>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: SOLAR.muted }}>SolarOS connects your proposals, pipeline, crew, and social presence into one unified command center.</p>
+        </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {MODULES.map((m, i) => (
+            <motion.a key={m.label} href={m.path} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.06 }}
+              className="relative rounded-2xl p-6 group cursor-pointer" style={{ background: SOLAR.bg, border: `1px solid ${SOLAR.border}` }}>
+              {m.badge && <span className="absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase" style={{ background: `${m.color}20`, color: m.color }}>{m.badge}</span>}
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: `${m.color}18` }}>
+                <div className="w-4 h-4 rounded-sm" style={{ background: m.color }} />
+              </div>
+              <div className="font-semibold mb-1">{m.label}</div>
+              <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ArrowRight size={16} style={{ color: m.color }} />
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section id="testimonials" className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: SOLAR.accent }}>Customer Stories</div>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Trusted by solar companies</h2>
+        </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((t, i) => (
+            <motion.div key={t.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+              className="rounded-2xl p-6" style={{ background: SOLAR.surface, border: `1px solid ${SOLAR.border}` }}>
+              <div className="flex gap-1 mb-4">
+                {Array.from({ length: t.rating }).map((_, j) => <Star key={j} size={14} style={{ color: SOLAR.accent }} fill={SOLAR.accent} />)}
+              </div>
+              <p className="text-sm leading-relaxed mb-6" style={{ color: SOLAR.text }}>"{t.content}"</p>
+              <div>
+                <div className="font-semibold text-sm">{t.name}</div>
+                <div className="text-xs" style={{ color: SOLAR.muted }}>{t.role}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pricing() {
+  return (
+    <section id="pricing" className="py-24 px-6" style={{ background: SOLAR.surface }}>
+      <div className="max-w-6xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: SOLAR.primary }}>Simple Pricing</div>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Start free. Scale as you grow.</h2>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: SOLAR.muted }}>No per-seat gotchas. No hidden fees. Just a platform that grows with your business.</p>
+        </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {PRICING.map((p, i) => (
+            <motion.div key={p.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+              className="relative rounded-2xl p-6" style={{ background: p.popular ? `${p.color}10` : SOLAR.bg, border: `1px solid ${p.popular ? p.color + '40' : SOLAR.border}` }}>
+              {p.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold px-3 py-1 rounded-full uppercase" style={{ background: p.color, color: '#000' }}>Most Popular</div>}
+              <div className="text-sm font-semibold mb-1" style={{ color: p.color }}>{p.name}</div>
+              <div className="text-3xl font-bold mb-1">${p.price}<span className="text-sm font-normal" style={{ color: SOLAR.muted }}>/mo</span></div>
+              <div className="text-xs mb-5" style={{ color: SOLAR.muted }}>{p.desc}</div>
+              <div className="space-y-2 mb-6">
+                {p.features.map(f => (
+                  <div key={f} className="flex items-center gap-2 text-xs" style={{ color: SOLAR.muted }}>
+                    <CheckCircle2 size={13} style={{ color: p.color }} />{f}
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {SOCIAL_ACCOUNTS.map((acc) => (
-                <div key={acc.platform} className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: acc.connected ? `${SOLAR.success}10` : SOLAR.surface2 }}>
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: acc.connected ? `${SOLAR.success}20` : 'rgba(255,255,255,0.05)' }}>
-                    <acc.icon size={11} style={{ color: acc.connected ? SOLAR.success : SOLAR.muted }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium truncate">{acc.name}</div>
-                    {acc.followers && <div className="text-[10px]" style={{ color: SOLAR.muted }}>{acc.followers}</div>}
-                  </div>
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: acc.connected ? SOLAR.success : SOLAR.muted }} />
-                </div>
-              ))}
-            </div>
-            <SocialPreview platform="facebook" content="Just completed a 12kW residential installation in South Tampa! Our clients are now saving $280/month on their electric bills. Ready to make the switch? DM us for a free consultation." scheduled="Tomorrow 9:00 AM" />
-          </motion.div>
-        </div>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-8 flex items-center justify-center gap-3">
-          {[
-            { label: 'Create Proposal', icon: FileText, color: SOLAR.primary },
-            { label: 'Schedule Post', icon: Megaphone, color: '#FF2D55' },
-            { label: 'Add Team Member', icon: Users, color: '#BF5FFF' },
-            { label: 'View Permits', icon: Shield, color: SOLAR.warning },
-          ].map((action) => (
-            <button key={action.label} className="flex items-center gap-2 px-5 py-3 rounded-2xl font-medium text-sm hover:scale-[1.02] transition-transform" style={{ background: `${action.color}15`, border: `1px solid ${action.color}30`, color: action.color }}>
-              <action.icon size={16} />
-              {action.label}
-            </button>
+              <a href="/dashboard" className="block text-center text-sm font-semibold py-2.5 rounded-xl" style={{ background: p.popular ? p.color : `${p.color}20`, color: p.popular ? '#000' : p.color }}>
+                Get Started
+              </a>
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
+    </section>
+  );
+}
+
+function CTA() {
+  return (
+    <section className="py-24 px-6 relative overflow-hidden">
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 70% at 50% 100%, rgba(255,107,0,0.1) 0%, transparent 60%)` }} />
+      <div className="max-w-3xl mx-auto text-center relative z-10">
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Ready to run your solar company like a pro?</h2>
+        <p className="text-xl mb-10" style={{ color: SOLAR.muted }}>Join solar companies across Florida that are closing more deals, installing faster, and spending less time on admin.</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/dashboard" className="flex items-center gap-2 px-8 py-4 rounded-2xl text-lg font-bold" style={{ background: SOLAR.primary, color: '#000' }}>
+            Start Free Trial <ArrowRight size={18} />
+          </a>
+          <div className="flex items-center gap-2 text-sm" style={{ color: SOLAR.muted }}>
+            <Clock size={14} />No credit card required
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="px-6 py-12" style={{ borderTop: `1px solid ${SOLAR.border}` }}>
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Sun size={16} style={{ color: SOLAR.primary }} />
+          <span className="font-bold text-sm">SolarOS</span>
+          <span className="text-xs" style={{ color: SOLAR.muted }}>The Operating System for Solar Companies</span>
+        </div>
+        <div className="flex items-center gap-6">
+          {['Privacy', 'Terms', 'Contact'].map(item => (
+            <a key={item} href="#" className="text-xs" style={{ color: SOLAR.muted }}>{item}</a>
+          ))}
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <div style={{ background: SOLAR.bg, color: SOLAR.text }}>
+      <Nav />
+      <Hero />
+      <Stats />
+      <Features />
+      <Modules />
+      <Testimonials />
+      <Pricing />
+      <CTA />
+      <Footer />
     </div>
   );
 }
