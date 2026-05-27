@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Search, Filter, ChevronRight, Calendar, User, DollarSign, Home, 
-  FileText, Clock, CheckCircle2, AlertCircle, X, Zap, TrendingUp, MoreMenu, Image as ImageIcon, ArrowRight
+  FileText, Clock, CheckCircle2, AlertCircle, X, Zap, TrendingUp, MoreHorizontal as MoreMenu, Edit, Image as ImageIcon, ArrowRight
 } from 'lucide-react';
 
 const SOLAR = {
@@ -234,7 +234,7 @@ export default function PipelinePage() {
         </div>
       </div>
       <AnimatePresence>
-        {selectedJob && selectedStage && <JobModal job={selectedJob} stage={selectedStage} onClose={() => setSelectedJob(null)} onMove={handleJobMove} />}
+        {selectedJob && selectedStage && <JobModal job={selectedJob} stage={selectedStage} onClose={() => setSelectedJob(null)} onMove={(direction) => handleJobMove(selectedJob.id, direction)} />}
       </AnimatePresence>
     </div>
   );
