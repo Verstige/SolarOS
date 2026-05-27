@@ -11,8 +11,10 @@ COPY . .
 RUN npm run build
 
 USER nextjs
-ENV NODE_ENV=production PORT=3000
+ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
 
 EXPOSE 3000
 
-CMD ["node", ".next/standalone/server.js"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 CMD curl -f http://localhost:3000/ || exit 1
+
+CMD ["npm", "start"]
